@@ -864,7 +864,7 @@ let lastTs = null;
 let enemies = []; // {el, xPct, laneY}
 const GIRL_HIT_ZONE_PCT = 20; // после этой отметки хинкали считается пропущенным
 const VISIBLE_ATTACK_PCT = 99;  // хинкали должен появиться в кадре (xPct <= это число), иначе бить его нельзя
-const ATTACK_COOLDOWN_MS = 150; // ⏱ КУЛДАУН МЕЖДУ УДАРАМИ (в миллисекундах) — поменяй это число, чтобы бить чаще/реже
+const ATTACK_COOLDOWN_MS = 10; // ⏱ КУЛДАУН МЕЖДУ УДАРАМИ (в миллисекундах) — поменяй это число, чтобы бить чаще/реже
 let attackReady = true;
 
 function swingRacket(){
