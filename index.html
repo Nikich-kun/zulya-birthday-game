@@ -863,8 +863,8 @@ let rafId = null;
 let lastTs = null;
 let enemies = []; // {el, xPct, laneY}
 const GIRL_HIT_ZONE_PCT = 20; // после этой отметки хинкали считается пропущенным
-const VISIBLE_ATTACK_PCT = 99;  // хинкали должен появиться в кадре (xPct <= это число), иначе бить его нельзя
-const ATTACK_COOLDOWN_MS = 10; // ⏱ КУЛДАУН МЕЖДУ УДАРАМИ (в миллисекундах) — поменяй это число, чтобы бить чаще/реже
+const ENEMY_APPEAR_MARGIN_PCT = 8; // 👀 запас в % экрана — насколько хинкали должен УЖЕ БЫТЬ ВИДЕН целиком, прежде чем его можно ударить (больше = дольше нужно ждать, пока появится)
+const ATTACK_COOLDOWN_MS = 350; // ⏱ КУЛДАУН МЕЖДУ УДАРАМИ (в миллисекундах) — поменяй это число, чтобы бить чаще/реже
 let attackReady = true;
 
 function swingRacket(){
@@ -971,13 +971,22 @@ function gameLoop(ts){
   rafId = requestAnimationFrame(gameLoop);
 }
 
+const ENEMY_WIDTH_PX = 60; // ширина спрайта хинкали (см. .enemy-inner в CSS)
+function isTargetable(en){
+  const areaW = gameArea.clientWidth || 1;
+  const widthPct = (ENEMY_WIDTH_PX / areaW) * 100;
+  // хинкали должен целиком зайти в кадр (правый край спрайта внутри экрана) + небольшой запас,
+  // чтобы его реально было видно, а не бить в момент появления на самом краю
+  return en.xPct <= (100 - widthPct - ENEMY_APPEAR_MARGIN_PCT);
+}
+
 function attackNearest(){
   if(!gameActive || !attackReady) return;
 
-  // ищем ближайшего ВИДИМОГО врага — те, что ещё за кадром (xPct > VISIBLE_ATTACK_PCT), трогать нельзя
+  // ищем ближайшего ВИДИМОГО врага — тех, что ещё за кадром или только выезжают, трогать нельзя
   let idx = -1;
   for(let i=0;i<enemies.length;i++){
-    if(enemies[i].xPct <= VISIBLE_ATTACK_PCT && (idx===-1 || enemies[i].xPct < enemies[idx].xPct)){
+    if(isTargetable(enemies[i]) && (idx===-1 || enemies[i].xPct < enemies[idx].xPct)){
       idx = i;
     }
   }
