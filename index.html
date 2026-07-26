@@ -367,13 +367,34 @@
     transition:left .13s linear, top .13s linear;
     filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));
   }
-  #skipHint{
-    position:absolute; bottom:14px; left:0; right:0; text-align:center;
-    padding:0 20px;
-    font-size:9px; line-height:1.8; opacity:.9; font-family:'Courier New',monospace;
-    text-transform:uppercase; letter-spacing:.5px;
-    color:var(--cream); text-shadow:2px 2px 0 rgba(0,0,0,.5);
+  #attackBtn{
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
     z-index:5;
+    font-family:'Courier New',monospace;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:#fff;
+    background:#D93A3A;
+    border:3px solid #6e0f0f;
+    box-shadow:0 0 0 3px #ffb3b3, 0 5px 0 0 #6e0f0f;
+    padding:12px 34px;
+    border-radius:0;
+    cursor:pointer;
+    animation:attackBtnPulse 1.1s ease-in-out infinite;
+    pointer-events:none; /* тап всё равно ловится всем экраном, кнопка — только подсказка */
+  }
+  @keyframes attackBtnPulse{
+    0%,100%{ transform:translateX(-50%) scale(1); }
+    50%{ transform:translateX(-50%) scale(1.06); }
+  }
+  #attackBtn.cooling{
+    animation:none;
+    background:#7a3a3a;
+    border-color:#3a1414;
+    box-shadow:0 0 0 3px rgba(255,179,179,.4), 0 5px 0 0 #3a1414;
+    opacity:.75;
   }
 
   /* ============ FINAL SCREEN ============ */
@@ -527,7 +548,7 @@
     <div id="gameArea">
       <div id="girlWrap"><div id="girlSprite"></div></div>
     </div>
-    <div id="skipHint">тапай где угодно — она достанет любого 👆</div>
+    <button id="attackBtn" type="button">Атакуй</button>
   </div>
 
   <!-- SCREEN 3: финал -->
@@ -992,7 +1013,12 @@ function attackNearest(){
   }
 
   attackReady = false;
-  setTimeout(()=>{ attackReady = true; }, ATTACK_COOLDOWN_MS);
+  const attackBtn = document.getElementById('attackBtn');
+  if(attackBtn) attackBtn.classList.add('cooling');
+  setTimeout(()=>{
+    attackReady = true;
+    if(attackBtn) attackBtn.classList.remove('cooling');
+  }, ATTACK_COOLDOWN_MS);
   swingRacket();
 
   if(idx === -1){
